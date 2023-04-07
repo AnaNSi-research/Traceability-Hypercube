@@ -1,0 +1,24 @@
+{
+  "name": "traceability-dht",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/EmmanueleBollino/traceability-DHT.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/EmmanueleBollino/traceability-DHT/issues"
+  },
+  "homepage": "https://github.com/EmmanueleBollino/traceability-DHT#readme",
+  "dependencies": {
+    "@angular/cli": "^15.2.5",
+    "truffle": "^5.8.1",
+    "typescript": "^5.0.3"
+  }
+}

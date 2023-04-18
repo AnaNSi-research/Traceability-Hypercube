@@ -16,7 +16,7 @@ const wallet = new ethers.Wallet(privateKey, provider);
 const factory = new ethers.ContractFactory(contract.abi, contract.bytecode, wallet);
 
 const main = async() => {
-    const deployedContract = await factory.deploy();
+    const deployedContract = await factory.deploy({value: ethers.utils.parseEther("1")});
     console.log("everything is ok, I guess");
 }
 

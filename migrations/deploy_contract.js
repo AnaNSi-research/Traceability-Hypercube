@@ -6,7 +6,9 @@ const contractFile = fs.readFileSync('build/contracts/SupplyChain.json');
 const contract = JSON.parse(contractFile.toString());
 
 
-const provider = new ethers.providers.Web3Provider(ganache.provider());
+const url = "http://localhost:8545"
+const provider = new ethers.providers.JsonRpcProvider(url);
+
 const ERC20_ABI = [
     "function addEntity(address _id, string memory _role) public"
 ]
@@ -16,8 +18,8 @@ const wallet = new ethers.Wallet(privateKey, provider);
 const factory = new ethers.ContractFactory(contract.abi, contract.bytecode, wallet);
 
 const main = async() => {
-    const deployedContract = await factory.deploy({value: ethers.utils.parseEther("1")});
-    console.log("everything is ok, I guess");
+    const deployedContract = await factory.deploy();
+    console.log(`Deployed contract with address: ${deployedContract.address}`);
 }
 
 main();

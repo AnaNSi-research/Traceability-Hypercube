@@ -1,5 +1,4 @@
 const ethers = require("ethers");
-const ganache = require("ganache");
 const fs = require("fs");
 
 const contractFile = fs.readFileSync('build/contracts/SupplyChain.json');

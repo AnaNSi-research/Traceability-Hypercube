@@ -19,9 +19,14 @@
   "homepage": "https://github.com/EmmanueleBollino/traceability-DHT#readme",
   "dependencies": {
     "@angular/cli": "^15.2.5",
+    "@openzeppelin/contracts": "^4.8.3",
+    "@openzeppelin/upgrades": "^2.8.0",
     "ethers": "^5.5.4",
     "ganache": "^7.8.0",
     "truffle": "^5.8.1",
     "typescript": "^5.0.3"
+  },
+  "devDependencies": {
+    "@openzeppelin/truffle-upgrades": "^1.18.2"
   }
 }

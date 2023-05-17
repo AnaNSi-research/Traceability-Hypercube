@@ -1,27 +1,32 @@
 import json
 from web3 import Web3, HTTPProvider
 
-# truffle development blockchain address
 blockchain_address = "http://localhost:8545"
+chain_id = 1337
 
-# Client instance to interact with the blockchain
 web3 = Web3(HTTPProvider(blockchain_address))
-# Set the default account (so we don't need to set the "from" for every transaction call)
-web3.eth.defaultAccount = web3.eth.accounts[0]
+first_account = web3.eth.accounts[0]
+private_key = "0x4d633117b6cc5572178c07ae35330570df896f1cfa91199309cc40d462349545"
 
 # Path to the compiled contract JSON file
-compiled_contract_path = 'build/contracts/Car.json'
-# Deployed contract address (see `migrate` command output: `contract address`)
-deployed_contract_address = '0x792c2a0EBD62A74Bd02F51bbA4e6233bB58D45b2'
+compiled_contract_path = 'build/contracts/CarFactory.json'
 
 with open(compiled_contract_path) as file:
     contract_json = json.load(file)  # load contract info as JSON
     contract_abi = contract_json['abi']  # fetch contract's abi - necessary to call its functions
+    contract_bytecode = contract_json['bytecode']
 
 # Fetch deployed contract reference
-contract = web3.eth.contract(address=deployed_contract_address, abi=contract_abi)
+contract = web3.eth.contract(address=first_account, abi=contract_abi, bytecode=contract_bytecode)
 
-# Call contract function (this is not persisted to the blockchain)
-message = contract.functions.sayHello().call()
+# Submit the transaction deplays the contract
+transaction = web3.eth.send_transaction({
+    "from": first_account
+})
 
-print(message)
+print("Deploying Contract!")
+
+# Wait for the transaction to be mined, and get transaction receipt
+print("Waiting for Transaction to finish...")
+tx_receipt = web3.eth.wait_for_transaction_receipt(transaction)
+print(f"Done! Contract Deployed to {tx_receipt.contractAddress} \n")

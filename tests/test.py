@@ -17,16 +17,28 @@ with open(compiled_contract_path) as file:
     contract_bytecode = contract_json['bytecode']
 
 # Fetch deployed contract reference
-contract = web3.eth.contract(address=first_account, abi=contract_abi, bytecode=contract_bytecode)
+car_factory = web3.eth.contract(bytecode=contract_bytecode, abi=contract_abi)
 
-# Submit the transaction deplays the contract
-transaction = web3.eth.send_transaction({
-    "from": first_account
-})
-
-print("Deploying Contract!")
+contract_data = car_factory.constructor(web3.eth.accounts[1]).build_transaction(
+    {
+        'from': first_account
+    }
+)
+tx_hash = web3.eth.send_transaction(contract_data)
+print("Deploying Contract...")
 
 # Wait for the transaction to be mined, and get transaction receipt
 print("Waiting for Transaction to finish...")
-tx_receipt = web3.eth.wait_for_transaction_receipt(transaction)
-print(f"Done! Contract Deployed to {tx_receipt.contractAddress} \n")
+tx_receipt = web3.eth.wait_for_transaction_receipt(tx_hash)
+print(f"Contract Deployed(Car Factory) to {tx_receipt.contractAddress} \n")
+
+deployed_car_factory = web3.eth.contract(address=tx_receipt.contractAddress, abi=contract_abi)
+
+for i in range(10):
+    create_car_tx = deployed_car_factory.functions.createCar(i).transact({"from": web3.eth.accounts[i]})
+    create_car_tx_receipt = web3.eth.wait_for_transaction_receipt(create_car_tx)
+    receipt_car = web3.eth.get_transaction_receipt(create_car_tx)
+
+cars = deployed_car_factory.functions.getCars().call()
+
+print(len(cars))

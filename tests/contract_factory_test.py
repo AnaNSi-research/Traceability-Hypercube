@@ -1,3 +1,4 @@
+import asyncio
 import json
 from web3 import Web3, HTTPProvider
 
@@ -6,7 +7,6 @@ chain_id = 1337
 
 web3 = Web3(HTTPProvider(blockchain_address))
 first_account = web3.eth.accounts[0]
-private_key = "0x4d633117b6cc5572178c07ae35330570df896f1cfa91199309cc40d462349545"
 
 # Path to the compiled contract JSON file
 car_factory_contract_path = 'build/contracts/CarFactory.json'
@@ -35,22 +35,28 @@ print(f"Contract Deployed(Car Factory) to {tx_receipt.contractAddress} \n")
 
 deployed_car_factory = web3.eth.contract(address=tx_receipt.contractAddress, abi=car_factory_contract_abi)
 
+def handle_event(event):
+    event_json = json.loads(Web3.to_json(event))
+    car_addr = event_json["args"]["newCarAddress"]
 
-create_car_tx = deployed_car_factory.functions.createCar("ferrari", "rosso").transact({"from": web3.eth.accounts[1]})
-create_car_tx_receipt = web3.eth.wait_for_transaction_receipt(create_car_tx)
-receipt_car = web3.eth.get_transaction_receipt(create_car_tx)
+    print(deployed_car_factory.functions.getCarInfo(car_addr).call())
 
-cars = deployed_car_factory.functions.getCars().call()
+async def log_loop(event_filter, poll_interval):
+    while True:
+        for CarCreated in event_filter.get_new_entries():
+            handle_event(CarCreated)
+        await asyncio.sleep(poll_interval)
 
+def main():
+    event_filter = deployed_car_factory.events.CarCreated.create_filter(fromBlock='latest')
+    loop = asyncio.get_event_loop()
+    try:
+        loop.run_until_complete(
+            asyncio.gather(
+                log_loop(event_filter, 2)))
+    finally:
+        # close loop to free up system resources
+        loop.close()
 
-with open(car_contract_path) as file:
-    car_contract_json = json.load(file)
-    car_contract_abi = car_contract_json['abi']
-    car_contract_bytecode = car_contract_json['bytecode']
-
-first_car = web3.eth.contract(address=cars[0], abi=car_contract_abi)
-
-colour = first_car.functions.getColour().call({"from": web3.eth.accounts[2]})
-brand = first_car.functions.getBrand().call({"from": web3.eth.accounts[2]})
-
-print(colour, brand)
+if __name__ == "__main__":
+    main()

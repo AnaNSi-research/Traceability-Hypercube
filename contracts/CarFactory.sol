@@ -2,30 +2,39 @@
 pragma solidity ^0.8.0;
 
 import "./Car.sol";
-import "./CloneFactory.sol";
+import "../node_modules/@optionality.io/clone-factory/contracts/CloneFactory.sol";
+import "../node_modules/@openzeppelin/contracts/access/Ownable.sol";
 
-contract CarFactory is CloneFactory {
-    Car[] public cars;
-
+contract CarFactory is Ownable, CloneFactory {
     string[] private colours = ["rosso", "giallo", "blu", "nero", "bianco"];
     string[] private brands = ["ferrari", "lamborghini"];
-    address masterContract;
+    address public libraryAddress;
 
-    constructor(address _masterContract){
-        masterContract = _masterContract;
+    struct carInfo {
+        string brand;
+        string colour;
     }
 
-    function createCar(string memory brand, string memory colour) external{
+    mapping(address => carInfo) public carInfos;
 
+    event CarCreated(address newCarAddress);
+
+    constructor(address _libraryAddress){
+        libraryAddress = _libraryAddress;
+    }
+
+    function setLibraryAddress(address _libraryAddress) public onlyOwner {
+        libraryAddress = _libraryAddress;
+    }
+
+    function createCar(string memory brand, string memory colour) external {
         require(checkBrand(brand), "Brand not available, pick another");
         require(checkColour(colour), "Colour not available, pick another");
-        Car car = Car(createClone(masterContract));
-        car.init(brand, colour);
-        cars.push(car);
-    }
 
-    function getCars() external view returns(Car[] memory){
-        return cars;
+        address car = createClone(libraryAddress);
+        Car(car).init(brand, colour);
+        addCarInfo(car, carInfo(brand, colour));
+        emit CarCreated(car);
     }
 
     function checkColour(string memory colour) private view returns(bool) {
@@ -48,5 +57,13 @@ contract CarFactory is CloneFactory {
 
     function compareStrings(string memory a, string memory b) private pure returns(bool) {
         return (keccak256(abi.encodePacked((a))) == keccak256(abi.encodePacked((b))));
+    }
+
+    function addCarInfo(address _addr, carInfo memory car_info) public {
+        carInfos[_addr] = car_info;
+    }
+
+    function getCarInfo(address _addr) public view returns(carInfo memory) {
+        return carInfos[_addr];
     }
 }

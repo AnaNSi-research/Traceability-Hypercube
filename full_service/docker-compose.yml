@@ -1,0 +1,109 @@
+version: '3.9'
+services:
+  hypercube_1:
+    network_mode: 'host'
+    image: hypercube:latest
+    environment:
+      - HYPERCUBE_SIZE=3
+      - SUPERSET_THRESHOLD=10
+      - NODE_PORT=8880
+    # ports:
+    #   - 8881:8881
+  hypercube_2:
+    network_mode: 'host'
+    image: hypercube:latest
+    environment:
+      - HYPERCUBE_SIZE=3
+      - SUPERSET_THRESHOLD=10
+      - NODE_PORT=8881
+    # ports:
+    #   - 8882:8882
+  hypercube_3:
+    network_mode: 'host'
+    image: hypercube:latest
+    environment:
+      - HYPERCUBE_SIZE=3
+      - SUPERSET_THRESHOLD=10
+      - NODE_PORT=8882
+    # ports:
+    #   - 8883:8883
+  hypercube_4:
+    network_mode: 'host'
+    image: hypercube:latest
+    environment:
+      - HYPERCUBE_SIZE=3
+      - SUPERSET_THRESHOLD=10
+      - NODE_PORT=8883
+    # ports:
+    #   - 8884:8884
+  hypercube_5:
+    network_mode: 'host'
+    image: hypercube:latest
+    environment:
+      - HYPERCUBE_SIZE=3
+      - SUPERSET_THRESHOLD=10
+      - NODE_PORT=8884
+    # ports:
+    #   - 8885:8885
+  hypercube_6:
+    network_mode: 'host'
+    image: hypercube:latest
+    environment:
+      - HYPERCUBE_SIZE=3
+      - SUPERSET_THRESHOLD=10
+      - NODE_PORT=8885
+    # ports:
+    #   - 8886:8886
+  hypercube_7:
+    network_mode: 'host'
+    image: hypercube:latest
+    environment:
+      - HYPERCUBE_SIZE=3
+      - SUPERSET_THRESHOLD=10
+      - NODE_PORT=8886
+    # ports:
+    #   - 8887:8887
+  hypercube_8:
+    network_mode: 'host'
+    image: hypercube:latest
+    environment:
+      - HYPERCUBE_SIZE=3
+      - SUPERSET_THRESHOLD=10
+      - NODE_PORT=8887
+    # ports:
+    #   - 8888:8888
+  hypercube-client:
+    network_mode: 'host'
+    image: hypercube-client:latest
+    environment:
+      - HYPERCUBE_SIZE=3
+      - SUPERSET_THRESHOLD=10
+  hypercube-client-tracing:
+    network_mode: 'host'
+    image: hypercube-client-tracing:latest
+    environment:
+      - HYPERCUBE_SIZE=3
+      - SUPERSET_THRESHOLD=10
+      - BLOCKCHAIN_ADDRESS=http://localhost:8545
+      - CHAIN_ID=1337
+  ipfs:
+    network_mode: 'host'
+    image: ipfs/go-ipfs:latest
+    environment:
+      - IPFS_PROFILE=server
+      - IPFS_PATH=/ipfsdata
+    volumes:
+      - ./data/ipfs:/ipfsdata
+    ports:
+      - '4001:4001'
+      - '127.0.0.1:8080:8080'
+      - '127.0.0.1:8081:8081'
+      - '127.0.0.1:5001:5001'
+  ganache:
+    network_mode: 'host'
+    image: trufflesuite/ganache-cli:latest
+    volumes:
+      - ./ganache_data:/ganache_data
+    command: --seed 42 --db=/ganache_data
+    # ports:
+    #   - 8545:8545

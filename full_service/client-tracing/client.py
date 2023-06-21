@@ -9,12 +9,11 @@ import os
 
 
 class Client:
-    def __init__(self, blockchain_addr, chain_id, ipfs_addr, hypercube_addr, eth_address, private_key = None):
+    def __init__(self, blockchain_addr, chain_id, ipfs_addr, hypercube_addr, private_key = None):
         self.blockchain_addr = blockchain_addr
         self.chain_id = chain_id
         self.ipfs_addr = ipfs_addr
         self.hypercube_addr = hypercube_addr
-        self.eth_address = eth_address
         self.private_key = private_key
 
         self.w3 = Web3(Web3.HTTPProvider(blockchain_addr))

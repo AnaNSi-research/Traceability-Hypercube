@@ -6,7 +6,11 @@ import "./Car.sol";
 contract CarFactory {
     Car[] public cars;
 
-     function createCar(string memory _brand, string memory _colour, string memory _ipfs_img) external returns(Car car) {
+    function createCar(
+        Brand _brand,
+        Colour _colour,
+        string memory _ipfs_img
+    ) external returns (Car car) {
         car = new Car(_brand, _colour, _ipfs_img, msg.sender);
         cars.push(car);
     }

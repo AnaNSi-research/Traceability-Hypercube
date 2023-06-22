@@ -26,20 +26,6 @@ class Client:
 
         install_solc('0.8.19')
 
-    def deploy_factory(self, abi, bytecode):
-        contract_bin = self.w3.eth.contract(abi=abi, bytecode=bytecode)
-        tx_hash = contract_bin.constructor().transact({'from': self.acct.address})
-        tx_receipt = self.w3.eth.wait_for_transaction_receipt(tx_hash)
-
-        self.contract = self.w3.eth.contract(
-            address=tx_receipt.contractAddress,
-            abi=abi
-        )
-
-        print(f"Contract deployed to {tx_receipt.contractAddress}")
-
-        return self.contract
-
     def compile_contract(self, sol_path):
         with open(sol_path, "r") as file:
             contract = file.read()
@@ -51,6 +37,28 @@ class Client:
         abi = contract_interface['abi']
 
         return abi, bytecode
+
+    def deploy_factory(self, abi, bytecode, args={}):
+        contract_bin = self.w3.eth.contract(abi=abi, bytecode=bytecode)
+        tx_hash = contract_bin.constructor(**args).transact({'from': self.acct.address})
+        tx_receipt = self.w3.eth.wait_for_transaction_receipt(tx_hash)
+
+        self.contract = self.w3.eth.contract(
+            address=tx_receipt.contractAddress,
+            abi=abi,
+            bytecode=bytecode
+        )
+
+        print(f"Contract deployed to {tx_receipt.contractAddress}")
+
+        return self.contract
+    
+    def create_car(self, brand, colour, img_path): #TODO test
+        ipfs_img_addr = "" #TODO deploy image on ipfs
+        create_car_tx = self.contract.functions.createCar(brand, colour, ipfs_img_addr).transact({"from": self.acct.address})
+        create_car_tx_receipt = self.web3.eth.wait_for_transaction_receipt(create_car_tx)
+        receipt_car = self.web3.eth.get_transaction_receipt(create_car_tx)
+        #TODO add deployed car on hypercube
     
     #TODO create_car (through the factory contract)
         # TODO add created car to hypercube

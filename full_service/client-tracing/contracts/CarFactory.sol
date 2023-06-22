@@ -6,6 +6,8 @@ import "./Car.sol";
 contract CarFactory {
     Car[] public cars;
 
+    event CarCreated(Car _car);
+
     function createCar(
         Brand _brand,
         Colour _colour,
@@ -13,5 +15,6 @@ contract CarFactory {
     ) external returns (Car car) {
         car = new Car(_brand, _colour, _ipfs_img, msg.sender);
         cars.push(car);
+        emit CarCreated(car);
     }
 }

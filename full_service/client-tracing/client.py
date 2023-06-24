@@ -52,17 +52,19 @@ class Client:
 
         return self.contract
     
-    def create_car(self, brand, colour, img_path=None): #TODO test
+    def create_car(self, brand, colour, img_path=None):
         if img_path is not None:
             ipfs_img_addr = self.ipfs.add(img_path)['Hash']
         else:
             ipfs_img_addr = ""
-        print(ipfs_img_addr)
+        print("IPFS image address:", ipfs_img_addr)
 
-        create_car_tx = self.contract.functions.createCar(brand, colour, ipfs_img_addr).transact({"from": self.acct})
-        create_car_tx_receipt = self.web3.eth.wait_for_transaction_receipt(create_car_tx)
-        receipt_car = self.web3.eth.get_transaction_receipt(create_car_tx)
-        print(receipt_car)
+        tx = self.contract.functions.createCar(brand, colour, ipfs_img_addr).transact({"from": self.acct})
+        tx_receipt = self.w3.eth.wait_for_transaction_receipt(tx)
+
+        car_address = self.contract.events.CarCreated().process_receipt(tx_receipt)[0]['args']['_car']
+        print("Created new car at", car_address)
+
         #TODO add deployed car on hypercube
 
     #TODO search cars on the hypercube by keyword(s)

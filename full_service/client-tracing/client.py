@@ -58,8 +58,7 @@ class Client:
         return self.contract
 
     def create_car(self, brand, colour, img_path=None):
-        # TODO make brand and colour enums (now they are integers)
-
+        # TODO make sure that brand and colour are integers in the correct range (for the enums)
         # Add car image on IPFS
         if img_path is not None:
             ipfs_img_addr = self.ipfs.add(img_path)['Hash']

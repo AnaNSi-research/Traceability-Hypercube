@@ -103,7 +103,7 @@ services:
     network_mode: 'host'
     image: trufflesuite/ganache-cli:latest
     volumes:
-      - ./ganache_data:/ganache_data
+      - ./data/ganache:/ganache_data
     command: --seed 42 --db=/ganache_data
     # ports:
     #   - 8545:8545

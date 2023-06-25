@@ -5,3 +5,4 @@ ethers==0.1.1
 web3==6.5.0
 eth-utils==2.1.1
 py-solc-x==1.1.1
+Pillow==9.5.0

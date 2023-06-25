@@ -3,12 +3,24 @@ from eth_utils import address
 from web3 import Web3
 from eth_account import Account
 from eth_account.signers.local import LocalAccount
+from enum import IntEnum
 import ipfshttpclient
 import json
 import os
+import requests
 
+class Brand(IntEnum):
+    FERRARI = 0
+    LAMBORGHINI = 1
+    MASERATI = 2
+
+class Colour(IntEnum):
+    RED = 0
+    GREEN = 1
+    BLUE = 2
 
 class Client:
+
     def __init__(self, blockchain_addr="http://localhost:8545", chain_id="1337", ipfs_addr="/ip4/127.0.0.1/tcp/5001", hypercube_addr="localhost:8880", private_key=None):
         self.blockchain_addr = blockchain_addr
         self.chain_id = chain_id
@@ -57,6 +69,9 @@ class Client:
 
         return self.contract
 
+    def create_keyword(self, brand, colour):
+        return brand + colour + (max(Brand) - 1) * brand
+    
     def create_car(self, brand, colour, img_path=None):
         # TODO make sure that brand and colour are integers in the correct range (for the enums)
         # Add car image on IPFS
@@ -74,7 +89,8 @@ class Client:
         car_address = self.contract.events.CarCreated().process_receipt(tx_receipt)[0]['args']['_car']
         print("Created new car at", car_address)
 
-        # TODO add deployed car on hypercube
+        keyword = self.create_keyword(brand, colour)
+
 
     # TODO search cars on the hypercube by keyword(s)
 

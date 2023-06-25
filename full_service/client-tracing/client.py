@@ -1,25 +1,25 @@
 from solcx import compile_files, install_solc
-from eth_utils import address
 from web3 import Web3
 from eth_account import Account
-from eth_account.signers.local import LocalAccount
 from hypercube_requests import HypercubeRequests
 from enum import IntEnum
 from PIL import Image
 import ipfshttpclient
-import json
-import os
-import requests
+
 
 class Brand(IntEnum):
     FERRARI = 0
     LAMBORGHINI = 1
     MASERATI = 2
 
+
 class Colour(IntEnum):
     RED = 0
-    GREEN = 1
+    YELLOW = 1
     BLUE = 2
+    BLACK = 3
+    WHITE = 4
+
 
 class Client:
 
@@ -45,7 +45,8 @@ class Client:
         print("Initializing Factory")
         install_solc('0.8.19')
 
-        facotry_abi, factory_bytecode = self.compile_contract("./contracts/CarFactory.sol")
+        facotry_abi, factory_bytecode = self.compile_contract(
+            "./contracts/CarFactory.sol")
         self.contract = self.deploy_contract(facotry_abi, factory_bytecode)
 
         self.car_abi, _ = self.compile_contract("./contracts/Car.sol")
@@ -61,8 +62,7 @@ class Client:
 
     def deploy_contract(self, abi, bytecode, args={}):
         contract_bin = self.w3.eth.contract(abi=abi, bytecode=bytecode)
-        tx_hash = contract_bin.constructor(
-            **args).transact({'from': self.acct})
+        tx_hash = contract_bin.constructor(**args).transact({'from': self.acct})
         tx_receipt = self.w3.eth.wait_for_transaction_receipt(tx_hash)
 
         self.contract = self.w3.eth.contract(
@@ -77,7 +77,7 @@ class Client:
 
     def create_keyword(self, brand, colour):
         return brand + colour + (max(Brand) - 1) * brand
-    
+
     def create_car(self, brand, colour, img_path=None):
         # Add car image on IPFS
         if img_path is not None:
@@ -86,7 +86,7 @@ class Client:
         else:
             ipfs_img_addr = ""
             print("No IPFS image uploaded")
-        
+
         # Create new car through the car factory
         tx = self.contract.functions.createCar(brand, colour, ipfs_img_addr).transact({"from": self.acct})
         tx_receipt = self.w3.eth.wait_for_transaction_receipt(tx)
@@ -99,7 +99,7 @@ class Client:
 
         res = self.hypercube_requests.add_obj(car_address, keyword)
         print("Add car on hypercube:", res.text)
-        
+
         return res
 
     def search_car(self, brand, colour):
@@ -107,7 +107,7 @@ class Client:
 
         res = self.hypercube_requests.pin_search(keyword)
         print("Objects with keyword {}:\n".format(keyword), res.text)
-        
+
         return res
 
     def car_info(self, address):

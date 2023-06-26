@@ -11,7 +11,9 @@ ENV HOP_SERVER_PORT=6000
 #ENV HYPERCUBE_SIZE=3
 #ENV SUPERSET_THRESHOLD=10
 
-#COPY requirements.txt requirements.txt
+COPY requirements.txt requirements.txt
+COPY ./contracts/ /client_data/contracts/
+COPY ./objects/ /client_data/objects/
 COPY . .
 RUN pip3 install -r requirements.txt
 

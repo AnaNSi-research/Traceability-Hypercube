@@ -87,7 +87,10 @@ services:
       - BLOCKCHAIN_ADDRESS=http://localhost:8545
       - CHAIN_ID=1337
     volumes:
-      - ./data/client:/clientdata
+      - ./data/client:/client_data
+      - ./client-tracing/contracts:/client_data/contracts
+      - ./client-tracing/objects:/client_data/objects
+    #working_dir: /client_data
   ipfs:
     network_mode: 'host'
     image: ipfs/go-ipfs:latest

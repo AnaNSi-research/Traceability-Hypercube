@@ -120,7 +120,7 @@ class Client:
 
         print(brand.name, colour.name, owner, ipfs_img)
 
-        self.ipfs.get(ipfs_img, target='./downloads')
+        self.ipfs.get(ipfs_img, target='/client_data/downloads')
 
         return brand, colour, owner, ipfs_img
 

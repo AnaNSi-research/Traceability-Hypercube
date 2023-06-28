@@ -1,114 +1,230 @@
 version: '3.9'
+
+x-common-variables: &common-variables
+  HYPERCUBE_SIZE: 5
+  SUPERSET_THRESHOLD: 10
+  INIT_PORT: 8880
+
 services:
+  hypercube_0:
+    network_mode: 'host'
+    image: hypercube:latest
+    environment:
+      <<: *common-variables
+      NODE_PORT: 8880
   hypercube_1:
     network_mode: 'host'
     image: hypercube:latest
     environment:
-      - HYPERCUBE_SIZE=3
-      - SUPERSET_THRESHOLD=10
-      - NODE_PORT=8880
-    # ports:
-    #   - 8881:8881
+      <<: *common-variables
+      NODE_PORT: 8881
   hypercube_2:
     network_mode: 'host'
     image: hypercube:latest
     environment:
-      - HYPERCUBE_SIZE=3
-      - SUPERSET_THRESHOLD=10
-      - NODE_PORT=8881
-    # ports:
-    #   - 8882:8882
+      <<: *common-variables
+      NODE_PORT: 8882
   hypercube_3:
     network_mode: 'host'
     image: hypercube:latest
     environment:
-      - HYPERCUBE_SIZE=3
-      - SUPERSET_THRESHOLD=10
-      - NODE_PORT=8882
-    # ports:
-    #   - 8883:8883
+      <<: *common-variables
+      NODE_PORT: 8883
   hypercube_4:
     network_mode: 'host'
     image: hypercube:latest
     environment:
-      - HYPERCUBE_SIZE=3
-      - SUPERSET_THRESHOLD=10
-      - NODE_PORT=8883
-    # ports:
-    #   - 8884:8884
+      <<: *common-variables
+      NODE_PORT: 8884
   hypercube_5:
     network_mode: 'host'
     image: hypercube:latest
     environment:
-      - HYPERCUBE_SIZE=3
-      - SUPERSET_THRESHOLD=10
-      - NODE_PORT=8884
-    # ports:
-    #   - 8885:8885
+      <<: *common-variables
+      NODE_PORT: 8885
   hypercube_6:
     network_mode: 'host'
     image: hypercube:latest
     environment:
-      - HYPERCUBE_SIZE=3
-      - SUPERSET_THRESHOLD=10
-      - NODE_PORT=8885
-    # ports:
-    #   - 8886:8886
+      <<: *common-variables
+      NODE_PORT: 8886
   hypercube_7:
     network_mode: 'host'
     image: hypercube:latest
     environment:
-      - HYPERCUBE_SIZE=3
-      - SUPERSET_THRESHOLD=10
-      - NODE_PORT=8886
-    # ports:
-    #   - 8887:8887
+      <<: *common-variables
+      NODE_PORT: 8887
   hypercube_8:
     network_mode: 'host'
     image: hypercube:latest
     environment:
-      - HYPERCUBE_SIZE=3
-      - SUPERSET_THRESHOLD=10
-      - NODE_PORT=8887
-    # ports:
-    #   - 8888:8888
+      <<: *common-variables
+      NODE_PORT: 8888
+  hypercube_9:
+    network_mode: 'host'
+    image: hypercube:latest
+    environment:
+      <<: *common-variables
+      NODE_PORT: 8889
+  hypercube_10:
+    network_mode: 'host'
+    image: hypercube:latest
+    environment:
+      <<: *common-variables
+      NODE_PORT: 8890
+  hypercube_11:
+    network_mode: 'host'
+    image: hypercube:latest
+    environment:
+      <<: *common-variables
+      NODE_PORT: 8891
+  hypercube_12:
+    network_mode: 'host'
+    image: hypercube:latest
+    environment:
+      <<: *common-variables
+      NODE_PORT: 8892
+  hypercube_13:
+    network_mode: 'host'
+    image: hypercube:latest
+    environment:
+      <<: *common-variables
+      NODE_PORT: 8893
+  hypercube_14:
+    network_mode: 'host'
+    image: hypercube:latest
+    environment:
+      <<: *common-variables
+      NODE_PORT: 8894
+  hypercube_15:
+    network_mode: 'host'
+    image: hypercube:latest
+    environment:
+      <<: *common-variables
+      NODE_PORT: 8895
+  hypercube_16:
+    network_mode: 'host'
+    image: hypercube:latest
+    environment:
+      <<: *common-variables
+      NODE_PORT: 8896
+  hypercube_17:
+    network_mode: 'host'
+    image: hypercube:latest
+    environment:
+      <<: *common-variables
+      NODE_PORT: 8897
+  hypercube_18:
+    network_mode: 'host'
+    image: hypercube:latest
+    environment:
+      <<: *common-variables
+      NODE_PORT: 8898
+  hypercube_19:
+    network_mode: 'host'
+    image: hypercube:latest
+    environment:
+      <<: *common-variables
+      NODE_PORT: 8899
+  hypercube_20:
+    network_mode: 'host'
+    image: hypercube:latest
+    environment:
+      <<: *common-variables
+      NODE_PORT: 8900
+  hypercube_21:
+    network_mode: 'host'
+    image: hypercube:latest
+    environment:
+      <<: *common-variables
+      NODE_PORT: 8901
+  hypercube_22:
+    network_mode: 'host'
+    image: hypercube:latest
+    environment:
+      <<: *common-variables
+      NODE_PORT: 8902
+  hypercube_23:
+    network_mode: 'host'
+    image: hypercube:latest
+    environment:
+      <<: *common-variables
+      NODE_PORT: 8903
+  hypercube_24:
+    network_mode: 'host'
+    image: hypercube:latest
+    environment:
+      <<: *common-variables
+      NODE_PORT: 8904
+  hypercube_25:
+    network_mode: 'host'
+    image: hypercube:latest
+    environment:
+      <<: *common-variables
+      NODE_PORT: 8905
+  hypercube_26:
+    network_mode: 'host'
+    image: hypercube:latest
+    environment:
+      <<: *common-variables
+      NODE_PORT: 8906
+  hypercube_27:
+    network_mode: 'host'
+    image: hypercube:latest
+    environment:
+      <<: *common-variables
+      NODE_PORT: 8907
+  hypercube_28:
+    network_mode: 'host'
+    image: hypercube:latest
+    environment:
+      <<: *common-variables
+      NODE_PORT: 8908
+  hypercube_29:
+    network_mode: 'host'
+    image: hypercube:latest
+    environment:
+      <<: *common-variables
+      NODE_PORT: 8909
+  hypercube_30:
+    network_mode: 'host'
+    image: hypercube:latest
+    environment:
+      <<: *common-variables
+      NODE_PORT: 8910
+  hypercube_31:
+    network_mode: 'host'
+    image: hypercube:latest
+    environment:
+      <<: *common-variables
+      NODE_PORT: 8911
   hypercube-client:
     network_mode: 'host'
     image: hypercube-client:latest
     environment:
-      - HYPERCUBE_SIZE=3
-      - SUPERSET_THRESHOLD=10
+      <<: *common-variables
   hypercube-client-tracing:
     network_mode: 'host'
     image: hypercube-client-tracing:latest
     environment:
-      - HYPERCUBE_SIZE=3
-      - SUPERSET_THRESHOLD=10
-      - BLOCKCHAIN_ADDRESS=http://localhost:8545
-      - CHAIN_ID=1337
+      <<: *common-variables
+      BLOCKCHAIN_ADDRESS: http://localhost:8545
+      CHAIN_ID: 1337
     volumes:
       - ./data/client:/client_data
       - ./client-tracing/contracts:/client_data/contracts
       - ./client-tracing/objects:/client_data/objects
-    #working_dir: /client_data
   ipfs:
     network_mode: 'host'
     image: ipfs/go-ipfs:latest
     environment:
-      - IPFS_PROFILE=server
-      - IPFS_PATH=/ipfsdata
+      IPFS_PROFILE: server
+      IPFS_PATH: /ipfsdata
     volumes:
       - ./data/ipfs:/ipfsdata
-    ports:
-      - '4001:4001'
-      - '127.0.0.1:8080:8080'
-      - '127.0.0.1:8081:8081'
-      - '127.0.0.1:5001:5001'
   ganache:
     network_mode: 'host'
     image: trufflesuite/ganache-cli:latest
     volumes:
       - ./data/ganache:/ganache_data
     command: --seed 42 --db=/ganache_data
-    # ports:
-    #   - 8545:8545

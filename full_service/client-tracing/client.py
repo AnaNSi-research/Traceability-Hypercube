@@ -10,15 +10,15 @@ import ipfshttpclient
 class Brand(IntEnum):
     FERRARI = 0
     LAMBORGHINI = 1
-    MASERATI = 2
+    # MASERATI = 2
 
 
 class Colour(IntEnum):
     RED = 0
     YELLOW = 1
     BLUE = 2
-    BLACK = 3
-    WHITE = 4
+    # BLACK = 3
+    # WHITE = 4
 
 
 class Client:
@@ -77,7 +77,13 @@ class Client:
 
     def create_keyword(self, brand, colour):
         return brand + colour + (max(Brand) - 1) * brand
-
+    
+    def create_keyword_onehot(self, brand, colour):
+        b = (2 ** brand) if brand is not None else 0
+        c = (2 ** (max(Brand) + colour + 1)) if colour is not None else 0
+        
+        return b + c
+    
     def create_car(self, brand, colour, img_path=None):
         # Add car image on IPFS
         if img_path is not None:
@@ -95,7 +101,8 @@ class Client:
         print("Created new car at", car_address)
 
         # Add car on hypercube
-        keyword = self.create_keyword(brand, colour)
+        keyword = self.create_keyword_onehot(brand, colour)
+        print("Keyword", keyword)
 
         res = self.hypercube_requests.add_obj(car_address, keyword)
         print("Add car on hypercube:", res.text)
@@ -103,7 +110,7 @@ class Client:
         return res
 
     def search_car(self, brand, colour):
-        keyword = self.create_keyword(brand, colour)
+        keyword = self.create_keyword_onehot(brand, colour)
 
         res = self.hypercube_requests.pin_search(keyword)
         print("Objects with keyword {}:\n".format(keyword), res.text)
@@ -125,11 +132,25 @@ class Client:
         return brand, colour, owner, ipfs_img
 
     def remove_car(self, address, brand, colour):
-        keyword = self.create_keyword(brand, colour)
+        keyword = self.create_keyword_onehot(brand, colour)
 
         res = self.hypercube_requests.remove_obj(address, keyword)
         print(res)
 
         return res
+    
+    def superset_search(self, brand=None, colour=None, threshold=10):
+        assert(brand is None or colour is None)
+        assert(brand is not None or colour is not None)
+
+        keyword = self.create_keyword_onehot(brand, colour)
+
+        res = self.hypercube_requests.superset_search(keyword, threshold)
+        print(res)
+        print(res.text)
+
+        return res
+
+
 
     # TODO (optional) attach to an already deployed factory

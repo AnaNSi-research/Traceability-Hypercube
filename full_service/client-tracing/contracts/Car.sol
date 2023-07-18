@@ -10,6 +10,13 @@ contract Car {
     address public owner;
     string public ipfs_img;
 
+    function init(Brand _brand, Colour _colour, string memory _ipfs_img, address _owner) external {
+        brand = _brand;
+        colour = _colour;
+        ipfs_img = _ipfs_img;
+        owner = _owner;
+    }
+    
     constructor(Brand _brand, Colour _colour, string memory _ipfs_img, address _owner) {
         brand = _brand;
         colour = _colour;

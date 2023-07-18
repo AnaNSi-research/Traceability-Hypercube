@@ -15,8 +15,8 @@ class Brand(IntEnum):
 
 class Colour(IntEnum):
     RED = 0
-    YELLOW = 1
-    BLUE = 2
+    # YELLOW = 1
+    # BLUE = 2
     # BLACK = 3
     # WHITE = 4
 
@@ -45,18 +45,24 @@ class Client:
         print("Initializing Factory")
         install_solc('0.8.19')
 
-        facotry_abi, factory_bytecode = self.compile_contract(
-            "./contracts/CarFactory.sol")
-        self.contract = self.deploy_contract(facotry_abi, factory_bytecode)
+        # factory_abi, factory_bytecode = self.compile_contract(
+            # "./contracts/CarFactory.sol")
+        factory_abi, factory_bytecode = self.compile_contract(
+            "./contracts/CarCloneFactory.sol")
+        print(type(factory_abi), type(factory_bytecode))
+        print(factory_abi)
+        print("#"*25)
+        print(factory_bytecode)
+        self.contract = self.deploy_contract(factory_abi, factory_bytecode)
 
         self.car_abi, _ = self.compile_contract("./contracts/Car.sol")
 
     def compile_contract(self, sol_path):
-        compiled_sol = compile_files([sol_path], output_values=['abi', 'bin'])
+        compiled_sol = compile_files([sol_path], output_values=['abi', 'bin-runtime'])
         contract_id, contract_interface = compiled_sol.popitem()
 
         abi = contract_interface['abi']
-        bytecode = contract_interface['bin']
+        bytecode = contract_interface['bin-runtime']
 
         return abi, bytecode
 
@@ -72,6 +78,7 @@ class Client:
         )
 
         print(f"Contract deployed to {tx_receipt.contractAddress}")
+        print(f"Gas used: {tx_receipt.gasUsed}")
 
         return self.contract
 
@@ -98,7 +105,8 @@ class Client:
         tx_receipt = self.w3.eth.wait_for_transaction_receipt(tx)
         # retrieve retun value through log of emitted events by the transaction
         car_address = self.contract.events.CarCreated().process_receipt(tx_receipt)[0]['args']['_car']
-        print("Created new car at", car_address)
+        print(f"Created new car at {car_address}")
+        print(f"Gas used: {tx_receipt.gasUsed}")
 
         # Add car on hypercube
         keyword = self.create_keyword_onehot(brand, colour)

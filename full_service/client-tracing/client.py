@@ -48,21 +48,20 @@ class Client:
         # factory_abi, factory_bytecode = self.compile_contract(
             # "./contracts/CarFactory.sol")
         factory_abi, factory_bytecode = self.compile_contract(
-            "./contracts/CarCloneFactory.sol")
+            "contracts/CarCloneFactory.sol", "CarCloneFactory")
         print(type(factory_abi), type(factory_bytecode))
         print(factory_abi)
         print("#"*25)
         print(factory_bytecode)
         self.contract = self.deploy_contract(factory_abi, factory_bytecode)
 
-        self.car_abi, _ = self.compile_contract("./contracts/Car.sol")
+        self.car_abi, _ = self.compile_contract("contracts/Car.sol", "Car")
 
-    def compile_contract(self, sol_path):
-        compiled_sol = compile_files([sol_path], output_values=['abi', 'bin-runtime'])
-        contract_id, contract_interface = compiled_sol.popitem()
+    def compile_contract(self, source_file, contract_name):
+        compiled = compile_files([source_file], output_values=['abi', 'bin-runtime'])[f"{source_file}:{contract_name}"]
 
-        abi = contract_interface['abi']
-        bytecode = contract_interface['bin-runtime']
+        abi = compiled['abi']
+        bytecode = compiled['bin-runtime']
 
         return abi, bytecode
 

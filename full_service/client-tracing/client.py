@@ -45,14 +45,10 @@ class Client:
         print("Initializing Factory")
         install_solc('0.8.19')
 
-        # factory_abi, factory_bytecode = self.compile_contract(
-            # "./contracts/CarFactory.sol")
+        # factory_abi, factory_bytecode = self.compile_contract("./contracts/CarFactory.sol")
         factory_abi, factory_bytecode = self.compile_contract(
             "contracts/CarCloneFactory.sol", "CarCloneFactory")
-        print(type(factory_abi), type(factory_bytecode))
-        print(factory_abi)
-        print("#"*25)
-        print(factory_bytecode)
+        # TODO deploy base car to be cloned and pass that address as an argument to the constructor of the clone factory
         self.contract = self.deploy_contract(factory_abi, factory_bytecode)
 
         self.car_abi, _ = self.compile_contract("contracts/Car.sol", "Car")

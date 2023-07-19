@@ -3,6 +3,7 @@ from web3 import Web3
 from eth_account import Account
 from hypercube_requests import HypercubeRequests
 from keywords import Brand, Colour
+from contracts_utils import compile_contract, deploy_contract
 import ipfshttpclient
 
 
@@ -30,38 +31,31 @@ class Client:
         print("Initializing Factory")
         install_solc('0.8.19')
 
-        # factory_abi, factory_bytecode = self.compile_contract("./contracts/CarFactory.sol")
-        factory_abi, factory_bytecode = self.compile_contract(
-            "contracts/CarCloneFactory.sol", "CarCloneFactory")
-        # TODO deploy base car to be cloned and pass that address as an argument to the constructor of the clone factory
-        self.contract = self.deploy_contract(factory_abi, factory_bytecode)
+        self.car_abi, self.car_bytecode = compile_contract("contracts/Car.sol", "Car")
 
-        self.car_abi, self.car_bytecode = self.compile_contract("contracts/Car.sol", "Car")
+        self.factory = None
 
-    def compile_contract(self, source_file, contract_name):
-        compiled = compile_files([source_file], output_values=['abi', 'bin'])[f"{source_file}:{contract_name}"]
 
-        abi = compiled['abi']
-        bytecode = compiled['bin']
+    def deploy_standard_factory(self):
+        factory_abi, factory_bytecode = compile_contract("contracts/CarFactory.sol", "CarFactory")
+        tx_receipt = deploy_contract(self.w3, self.acct, factory_abi, factory_bytecode)
 
-        return abi, bytecode
+        self.attach_factory(factory_abi, factory_bytecode, tx_receipt.contractAddress)
 
-    def deploy_contract(self, abi, bytecode, args={}):
-        contract_bin = self.w3.eth.contract(abi=abi, bytecode=bytecode)
-        tx_hash = contract_bin.constructor(self.w3.eth.accounts[1]).transact({'from': self.acct})
-        # contract_data = contract_bin.constructor(self.w3.eth.accounts[1]).build_transaction({'from': self.acct})
-        # tx_hash = self.w3.eth.send_transaction(contract_data)
-        tx_receipt = self.w3.eth.wait_for_transaction_receipt(tx_hash)
-
-        self.attach_contract(abi, bytecode, tx_receipt.contractAddress)
-
-        print(f"Contract deployed to {tx_receipt.contractAddress}")
-        print(f"Gas used: {tx_receipt.gasUsed}")
-
-        return self.contract
+        return tx_receipt
     
-    def attach_contract(self, abi, bytecode, address):
-        self.contract = self.w3.eth.contract(
+    def deploy_clone_factory(self):
+        base_car_tx_receipt = deploy_contract(self.w3, self.acct, self.car_abi, self.car_bytecode, 0, 0, "", self.acct) # base car to be cloned
+
+        factory_abi, factory_bytecode = compile_contract("contracts/CarCloneFactory.sol", "CarCloneFactory")
+        tx_receipt = deploy_contract(self.w3, self.acct, factory_abi, factory_bytecode, base_car_tx_receipt.contractAddress)
+
+        self.attach_factory(factory_abi, factory_bytecode, tx_receipt.contractAddress)
+
+        return tx_receipt, base_car_tx_receipt
+    
+    def attach_factory(self, abi, bytecode, address):
+        self.factory = self.w3.eth.contract(
             address=address,
             abi=abi,
             bytecode=bytecode
@@ -77,6 +71,9 @@ class Client:
         return b + c
     
     def create_car(self, brand, colour, img_path=None):
+        if self.factory is None:
+            raise RuntimeError("Factory not initialized")
+        
         # Add car image on IPFS
         if img_path is not None:
             ipfs_img_addr = self.ipfs.add(img_path)['Hash']
@@ -86,10 +83,10 @@ class Client:
             print("No IPFS image uploaded")
 
         # Create new car through the car factory
-        tx = self.contract.functions.createCar(brand, colour, ipfs_img_addr).transact({"from": self.acct})
+        tx = self.factory.functions.createCar(brand, colour, ipfs_img_addr).transact({"from": self.acct})
         tx_receipt = self.w3.eth.wait_for_transaction_receipt(tx)
         # retrieve retun value through log of emitted events by the transaction
-        car_address = self.contract.events.CarCreated().process_receipt(tx_receipt)[0]['args']['_car']
+        car_address = self.factory.events.CarCreated().process_receipt(tx_receipt)[0]['args']['_car']
         print(f"Created new car at {car_address}")
         print(f"Gas used: {tx_receipt.gasUsed}")
 
@@ -120,7 +117,8 @@ class Client:
 
         print(brand.name, colour.name, owner, ipfs_img)
 
-        self.ipfs.get(ipfs_img, target='/client_data/downloads')
+        if ipfs_img is not None and ipfs_img != "":
+            self.ipfs.get(ipfs_img, target='/client_data/downloads')
 
         return brand, colour, owner, ipfs_img
 
@@ -143,7 +141,3 @@ class Client:
         print(res.text)
 
         return res
-
-
-
-    # TODO (optional) attach to an already deployed factory

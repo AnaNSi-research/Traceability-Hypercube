@@ -28,7 +28,7 @@ class Client:
         print("Using account", self.acct)
 
         print("Initializing Factory")
-        install_solc('0.8.19')
+        install_solc('0.8.0')
 
         # factory_abi, factory_bytecode = self.compile_contract("./contracts/CarFactory.sol")
         factory_abi, factory_bytecode = self.compile_contract(
@@ -48,7 +48,9 @@ class Client:
 
     def deploy_contract(self, abi, bytecode, args={}):
         contract_bin = self.w3.eth.contract(abi=abi, bytecode=bytecode)
-        tx_hash = contract_bin.constructor(**args).transact({'from': self.acct})
+        # tx_hash = contract_bin.constructor(**args).transact({'from': self.acct})
+        contract_data = contract_bin.constructor(self.w3.eth.accounts[1]).build_transaction({'from': self.acct})
+        tx_hash = self.w3.eth.send_transaction(contract_data)
         tx_receipt = self.w3.eth.wait_for_transaction_receipt(tx_hash)
 
         self.attach_contract(abi, bytecode, tx_receipt.contractAddress)

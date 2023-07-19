@@ -2,23 +2,8 @@ from solcx import compile_files, install_solc
 from web3 import Web3
 from eth_account import Account
 from hypercube_requests import HypercubeRequests
-from enum import IntEnum
-from PIL import Image
+from keywords import Brand, Colour
 import ipfshttpclient
-
-
-class Brand(IntEnum):
-    FERRARI = 0
-    LAMBORGHINI = 1
-    # MASERATI = 2
-
-
-class Colour(IntEnum):
-    RED = 0
-    # YELLOW = 1
-    # BLUE = 2
-    # BLACK = 3
-    # WHITE = 4
 
 
 class Client:
@@ -51,7 +36,7 @@ class Client:
         # TODO deploy base car to be cloned and pass that address as an argument to the constructor of the clone factory
         self.contract = self.deploy_contract(factory_abi, factory_bytecode)
 
-        self.car_abi, _ = self.compile_contract("contracts/Car.sol", "Car")
+        self.car_abi, self.car_bytecode = self.compile_contract("contracts/Car.sol", "Car")
 
     def compile_contract(self, source_file, contract_name):
         compiled = compile_files([source_file], output_values=['abi', 'bin-runtime'])[f"{source_file}:{contract_name}"]
@@ -66,16 +51,19 @@ class Client:
         tx_hash = contract_bin.constructor(**args).transact({'from': self.acct})
         tx_receipt = self.w3.eth.wait_for_transaction_receipt(tx_hash)
 
-        self.contract = self.w3.eth.contract(
-            address=tx_receipt.contractAddress,
-            abi=abi,
-            bytecode=bytecode
-        )
+        self.attach_contract(abi, bytecode, tx_receipt.contractAddress)
 
         print(f"Contract deployed to {tx_receipt.contractAddress}")
         print(f"Gas used: {tx_receipt.gasUsed}")
 
         return self.contract
+    
+    def attach_contract(self, abi, bytecode, address):
+        self.contract = self.w3.eth.contract(
+            address=address,
+            abi=abi,
+            bytecode=bytecode
+        )
 
     def create_keyword(self, brand, colour):
         return brand + colour + (max(Brand) - 1) * brand

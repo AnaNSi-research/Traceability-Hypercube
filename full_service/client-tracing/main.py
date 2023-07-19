@@ -1,6 +1,7 @@
 from config import *
 from keywords import Brand, Colour
 from client import Client
+from web3 import Web3
 from InquirerPy import inquirer
 from InquirerPy.base.control import Choice
 from InquirerPy.separator import Separator

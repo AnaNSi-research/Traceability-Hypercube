@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.19;
 
 enum Colour {RED, YELLOW, BLUE, BLACK, WHITE}
 enum Brand {FERRARI, LAMBORGHINI, MASERATI}

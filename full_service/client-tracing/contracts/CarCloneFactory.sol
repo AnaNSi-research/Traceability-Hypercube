@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.19;
 
 import "./Car.sol";
 import "./CloneFactory.sol";
@@ -23,7 +23,7 @@ contract CarCloneFactory is Ownable, CloneFactory {
         baseCarAddress = _baseCarAddress;
     }
 
-    function setLibraryAddress(address _baseCarAddress) public onlyOwner {
+    function setBaseCarAddress(address _baseCarAddress) public onlyOwner {
         baseCarAddress = _baseCarAddress;
     }
 

@@ -36,8 +36,9 @@ def menu(attached_factory: bool):
     ]
     if attached_factory:
         choices += [
-            Separator(line="*** Insertion ***"),
-            Choice(name="Deploy new car", value="dc"),
+            Separator(line="*** Data management ***"),
+            Choice(name="Create new car", value="dc"),
+            Choice(name="Remove car from hypercube", value="rc"),
             Separator(line="*** Search ***"),
             Choice(name="Get car", value="gc"),
             Choice(name="Pin-Search by keyword", value="pk"),
@@ -57,11 +58,14 @@ def menu(attached_factory: bool):
 
 
 if __name__ == '__main__':
+    client = Client()
+    print()
+
     attached_factory = False
     while True:
         choice = menu(attached_factory)
 
-        if choice == "df":
+        if choice == "df": # deploy factory
             f_choice = inquirer.select(
                 message="Select the kind of factory to deploy:",
                 choices=[
@@ -69,21 +73,33 @@ if __name__ == '__main__':
                     Choice(name="Clone", value="c")
                 ],
             ).execute()
-            if f_choice == "s":
-                # TODO
-                pass
-            elif f_choice == "c":
-                # TODO
-                pass
+            if f_choice == "s": # standard factory
+                tx_receipt = client.deploy_standard_factory()
+            elif f_choice == "c": #clone factory
+                tx_receipt, tx_receipt_base_car = client.deploy_clone_factory()
+                print("Total gas used:", (tx_receipt_base_car.gasUsed + tx_receipt.gasUsed))
+                print("Gas to deploy base car:", tx_receipt_base_car.gasUsed)
+
+            print("Gas to deploy factory:", tx_receipt.gasUsed)
+            print("Factory deployed at", tx_receipt.contractAddress)
 
             attached_factory = True
-            # TODO deploy factory
-        elif choice == "af":
+        elif choice == "af": # attach factory
             address = inquirer.text(message="Enter car factory address:",
                                     validate=Web3.is_address, invalid_message="Invalid contract address").execute()
+            facotry_path = inquirer.filepath(
+                message="Enter solidity factory code file path:",
+                default="./contracts/",
+                validate=PathValidator(
+                    is_file=True, message="Input is not a file"),
+                only_files=True,
+            ).execute()
+            facotry_name = inquirer.text(message="Enter factory contract name:").execute()
+
+            # TODO compile and attach factory
+
             attached_factory = True
-            # TODO attach factory
-        elif choice == "dc":
+        elif choice == "dc": # deploy car
             brand = get_brand()
             colour = get_colour()
             img_path = inquirer.filepath(
@@ -93,16 +109,36 @@ if __name__ == '__main__':
                     is_file=True, message="Input is not a file"),
                 only_files=True,
             ).execute()
-            # TODO deploy car
-        elif choice == "gc":
+
+            keyword, tx_receipt, hypercube_res = client.create_car(brand, colour, img_path)
+        elif choice == "rc": # remove car
             address = inquirer.text(message="Enter car address:", validate=Web3.is_address,
                                     invalid_message="Invalid contract address").execute()
-            pass  # TODO # get car
-        elif choice == "pk":
             brand = get_brand()
             colour = get_colour()
-            # TODO # pin search
-        elif choice == "sk":
+            
+            res = client.remove_car(address, brand, colour)
+            print("Rmove car", address, "outcome", res)
+        elif choice == "gc": # get car
+            address = inquirer.text(message="Enter car address:", validate=Web3.is_address,
+                                    invalid_message="Invalid contract address").execute()
+            brand, colour, owner, ipfs_img = client.car_info(address)
+
+            print("Brand:", brand.name.capitalize())
+            print("Clour:", colour.name.capitalize())
+            print("Owner:", owner)
+            print("IPFS img:", ipfs_img)
+        elif choice == "pk": # pin search
+            brand = get_brand()
+            colour = get_colour()
+            
+            keyword, res = client.search_car(brand, colour)
+
+            objects = res.text.strip().split(",")
+            print("{} Objects with keyword {}:".format(len(objects), keyword))
+            for o in objects:
+                print(o)
+        elif choice == "sk": # superset search
             k_choice = inquirer.select(
                 message="Select the keyword by which perform the search:",
                 choices=[
@@ -116,7 +152,13 @@ if __name__ == '__main__':
             elif k_choice == "c":
                 colour = get_colour()
                 brand = None
-            # TODO # superset search
+            
+            keyword, res = client.superset_search(brand, colour)
+
+            objects = res.text.strip().split(",")
+            print("{} Objects at distance [0, 1] with keyword {}:".format(len(objects), keyword))
+            for o in objects:
+                print(o)
         elif choice == "ex":
             print("Bye")
             break

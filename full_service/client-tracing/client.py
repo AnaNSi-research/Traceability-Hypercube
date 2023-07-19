@@ -4,6 +4,7 @@ from eth_account import Account
 from hypercube_requests import HypercubeRequests
 from keywords import Brand, Colour
 from contracts_utils import compile_contract, deploy_contract
+from config import SOLC_VERSION
 import ipfshttpclient
 
 
@@ -16,9 +17,13 @@ class Client:
         self.hypercube_addr = hypercube_addr
         self.private_key = private_key
 
+        print("Hypercube at", hypercube_addr)
         self.hypercube_requests = HypercubeRequests(hypercube_addr)
 
+        print("IPFS at", ipfs_addr)
         self.ipfs = ipfshttpclient.connect(ipfs_addr)
+
+        print("Blockchain at", blockchain_addr, "chain id", chain_id)
         self.w3 = Web3(Web3.HTTPProvider(blockchain_addr))
 
         if private_key is None:
@@ -28,8 +33,8 @@ class Client:
         self.w3.eth.default_account = self.acct
         print("Using account", self.acct)
 
-        print("Initializing Factory")
-        install_solc('0.8.19')
+        print("Installing solc", SOLC_VERSION)
+        install_solc(SOLC_VERSION)
 
         self.car_abi, self.car_bytecode = compile_contract("contracts/Car.sol", "Car")
 
@@ -95,17 +100,15 @@ class Client:
         print("Keyword", keyword)
 
         res = self.hypercube_requests.add_obj(car_address, keyword)
-        print("Add car on hypercube:", res.text)
+        print("Add car on hypercube result:", res.text)
 
-        return res
+        return keyword, tx_receipt, res
 
     def search_car(self, brand, colour):
         keyword = self.create_keyword_onehot(brand, colour)
-
         res = self.hypercube_requests.pin_search(keyword)
-        print("Objects with keyword {}:\n".format(keyword), res.text)
-
-        return res
+        
+        return keyword, res
 
     def car_info(self, address):
         contract = self.w3.eth.contract(address=address, abi=self.car_abi)
@@ -114,8 +117,6 @@ class Client:
         colour = Colour(contract.functions.colour().call())
         owner = contract.functions.owner().call()
         ipfs_img = contract.functions.ipfs_img().call()
-
-        print(brand.name, colour.name, owner, ipfs_img)
 
         if ipfs_img is not None and ipfs_img != "":
             self.ipfs.get(ipfs_img, target='/client_data/downloads')
@@ -126,7 +127,6 @@ class Client:
         keyword = self.create_keyword_onehot(brand, colour)
 
         res = self.hypercube_requests.remove_obj(address, keyword)
-        print(res)
 
         return res
     
@@ -137,7 +137,5 @@ class Client:
         keyword = self.create_keyword_onehot(brand, colour)
 
         res = self.hypercube_requests.superset_search(keyword, threshold)
-        print(res)
-        print(res.text)
 
-        return res
+        return keyword, res

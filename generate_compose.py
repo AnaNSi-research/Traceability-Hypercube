@@ -22,15 +22,7 @@ def generate_compose(hypercube_size, init_port = 8880, superset_threshold = 10, 
       NODE_PORT: {init_port + i}"""
     str += hypercube_services
 
-    if client_service:
-        client_service = """
-  hypercube-client:
-    network_mode: 'host'
-    image: hypercube-client:latest
-    environment:
-      <<: *common-variables"""
-        str += client_service
-        
+    if client_service:        
         client_tracing_service = """
   hypercube-client-tracing:
     network_mode: 'host'
@@ -48,7 +40,7 @@ def generate_compose(hypercube_size, init_port = 8880, superset_threshold = 10, 
         ipfs_service = """
   ipfs:
     network_mode: 'host'
-    image: ipfs/go-ipfs:latest
+    image: ipfs/go-ipfs::v0.8.0
     environment:
       IPFS_PROFILE: server
       IPFS_PATH: /ipfsdata

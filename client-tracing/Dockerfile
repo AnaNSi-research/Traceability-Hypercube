@@ -20,4 +20,4 @@ RUN pip3 install -r requirements.txt
 #EXPOSE 5000
 
 
-#CMD ["sh", "-c", "python3 server.py $INIT_PORT"]
+#CMD ["sh", "-c", "python3 main.py"]
